@@ -1,0 +1,3 @@
+[submodule "mav_trajectory_generation"]
+	path = mav_trajectory_generation
+	url = https://github.com/whoenig/mav_trajectory_generation.git
