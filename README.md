@@ -19,8 +19,8 @@ Clone and build this repository:
 
 ```
 git clone --recursive https://github.com/whoenig/uav_trajectories.git
-mkdir build
-cd build
+mkdir uav_trajectories/build
+cd uav_trajectories/build
 cmake ..
 make
 ```
