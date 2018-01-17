@@ -36,3 +36,13 @@ Example:
 ```
 ./genTrajectory -i ../examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o traj1.csv
 ```
+
+### Visualize Trajectory
+
+A python script can be used to visualize a trajectory csv-file (3D plot, velocity, acceleration, angular velocity, yaw). The first argument is the file and the second argument is the quadcopter of the UAV in kg.
+
+Example:
+
+```
+python3 ../scripts/plot_trajectory.py traj1.csv 0.035
+```
