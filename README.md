@@ -39,10 +39,10 @@ Example:
 
 ### Visualize Trajectory
 
-A python script can be used to visualize a trajectory csv-file (3D plot, velocity, acceleration, angular velocity, yaw). The first argument is the file and the second argument is the quadcopter of the UAV in kg.
+A python script can be used to visualize a trajectory csv-file (3D plot, velocity, acceleration, angular velocity, yaw).
 
 Example:
 
 ```
-python3 ../scripts/plot_trajectory.py traj1.csv 0.035
+python3 ../scripts/plot_trajectory.py traj1.csv
 ```

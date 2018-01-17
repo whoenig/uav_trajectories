@@ -51,7 +51,7 @@ class Polynomial4D:
       self.pz.derivative().p,
       self.pyaw.derivative().p)
 
-  def eval(self, mass, t):
+  def eval(self, t):
     result = TrajectoryOutput()
     # flat variables
     result.pos = np.array([self.px.eval(t), self.py.eval(t), self.pz.eval(t)])
@@ -71,7 +71,6 @@ class Polynomial4D:
     jerk = np.array([derivative3.px.eval(t), derivative3.py.eval(t), derivative3.pz.eval(t)])
 
     thrust = result.acc + np.array([0, 0, 9.81]) # add gravity
-    thrust_mag = mass * np.linalg.norm(thrust)
 
     z_body = normalize(thrust)
     x_world = np.array([np.cos(result.yaw), np.sin(result.yaw), 0])
@@ -79,7 +78,7 @@ class Polynomial4D:
     x_body = np.cross(y_body, z_body)
 
     jerk_orth_zbody = jerk - (np.dot(jerk, z_body) * z_body)
-    h_w = mass / thrust_mag * jerk_orth_zbody
+    h_w = jerk_orth_zbody / np.linalg.norm(thrust)
 
     result.omega = np.array([-np.dot(h_w, y_body), np.dot(h_w, x_body), z_body[2] * dyaw])
     return result
@@ -95,12 +94,12 @@ class Trajectory:
     self.polynomials = [Polynomial4D(row[0], row[1:9], row[9:17], row[17:25], row[25:33]) for row in data]
     self.duration = np.sum(data[:,0])
 
-  def eval(self, mass, t):
+  def eval(self, t):
     assert t >= 0
     assert t <= self.duration
 
     current_t = 0.0
     for p in self.polynomials:
       if t < current_t + p.duration:
-        return p.eval(mass, t - current_t)
+        return p.eval(t - current_t)
       current_t = current_t + p.duration
