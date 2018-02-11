@@ -11,6 +11,13 @@ class Polynomial:
   def __init__(self, p):
     self.p = p
 
+  def stretchtime(self, factor):
+    recip = 1.0 / factor;
+    scale = recip
+    for i in range(1, len(self.p)):
+      self.p[i] *= scale
+      scale *= recip
+
   # evaluate a polynomial using horner's rule
   def eval(self, t):
     assert t >= 0
@@ -50,6 +57,13 @@ class Polynomial4D:
       self.py.derivative().p,
       self.pz.derivative().p,
       self.pyaw.derivative().p)
+
+  def stretchtime(self, factor):
+    self.duration *= factor
+    self.px.stretchtime(factor)
+    self.py.stretchtime(factor)
+    self.pz.stretchtime(factor)
+    self.pyaw.stretchtime(factor)
 
   def eval(self, t):
     result = TrajectoryOutput()
@@ -93,6 +107,11 @@ class Trajectory:
     data = np.loadtxt(filename, delimiter=",", skiprows=1, usecols=range(33))
     self.polynomials = [Polynomial4D(row[0], row[1:9], row[9:17], row[17:25], row[25:33]) for row in data]
     self.duration = np.sum(data[:,0])
+
+  def stretchtime(self, factor):
+    for p in self.polynomials:
+      p.stretchtime(factor)
+    self.duration *= factor
 
   def eval(self, t):
     assert t >= 0

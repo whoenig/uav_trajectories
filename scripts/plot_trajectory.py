@@ -11,10 +11,14 @@ import uav_trajectory
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("trajectory", type=str, help="CSV file containing trajectory")
+  parser.add_argument("--stretchtime", type=float, help="stretch time factor (smaller means faster)")
   args = parser.parse_args()
 
   traj = uav_trajectory.Trajectory()
   traj.loadcsv(args.trajectory)
+
+  if args.stretchtime:
+    traj.stretchtime(args.stretchtime)
 
   ts = np.arange(0, traj.duration, 0.01)
   evals = np.empty((len(ts), 13))
