@@ -38,6 +38,8 @@ class TrajectoryOutput:
     self.acc = None   # acceleration [m/s^2]
     self.omega = None # angular velocity [rad/s]
     self.yaw = None   # yaw angle [rad]
+    self.roll = None  # required roll angle [rad]
+    self.pitch = None # required pitch angle [rad]
 
 
 # 4d single polynomial piece for x-y-z-yaw, includes duration.
@@ -95,6 +97,11 @@ class Polynomial4D:
     h_w = jerk_orth_zbody / np.linalg.norm(thrust)
 
     result.omega = np.array([-np.dot(h_w, y_body), np.dot(h_w, x_body), z_body[2] * dyaw])
+
+    # compute required roll/pitch angles
+    result.pitch = np.arcsin(-x_body[2])
+    result.roll = np.arctan2(y_body[2], z_body[2])
+
     return result
 
 
