@@ -67,6 +67,9 @@ class Polynomial4D:
     self.pz.stretchtime(factor)
     self.pyaw.stretchtime(factor)
 
+  # see Daniel Mellinger, Vijay Kumar:
+  #     Minimum snap trajectory generation and control for quadrotors. ICRA 2011: 2520-2525
+  #     section III. DIFFERENTIAL FLATNESS
   def eval(self, t):
     result = TrajectoryOutput()
     # flat variables
