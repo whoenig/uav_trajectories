@@ -72,15 +72,36 @@ int main(int argc, char **argv)
   // create vertices with their constraints
   auto input = load_csv<Matrix<double, Dynamic, 3> >(inputFile);
 
-  for (int row = 0; row < input.rows(); ++row) {
-    // std::cout << input.row(row) << std::endl;
-    mav_trajectory_generation::Vertex vertex(dimension);
-    if (row == 0 || row == input.rows() - 1) {
-      vertex.makeStartOrEnd(input.row(row), derivative_to_optimize);
-    } else {
-      vertex.addConstraint(mav_trajectory_generation::derivative_order::POSITION, input.row(row));
+  if (input.rows() < 2) {
+    std::cerr << "Not enough datapoints given!" << std::endl;
+    return 1;
+  }
+
+  if (input.rows() == 2) {
+    mav_trajectory_generation::Vertex v1(dimension);
+    v1.makeStartOrEnd(input.row(0), derivative_to_optimize);
+    vertices.push_back(v1);
+
+    mav_trajectory_generation::Vertex v2(dimension);
+    auto middle = (input.row(1) - input.row(0)) * 0.5 + input.row(0);
+    v2.addConstraint(mav_trajectory_generation::derivative_order::POSITION, middle);
+    vertices.push_back(v2);
+
+    mav_trajectory_generation::Vertex v3(dimension);
+    v3.makeStartOrEnd(input.row(1), derivative_to_optimize);
+    vertices.push_back(v3);
+  } else {
+    // at least 3 points given
+    for (int row = 0; row < input.rows(); ++row) {
+      // std::cout << input.row(row) << std::endl;
+      mav_trajectory_generation::Vertex vertex(dimension);
+      if (row == 0 || row == input.rows() - 1) {
+        vertex.makeStartOrEnd(input.row(row), derivative_to_optimize);
+      } else {
+        vertex.addConstraint(mav_trajectory_generation::derivative_order::POSITION, input.row(row));
+      }
+      vertices.push_back(vertex);
     }
-    vertices.push_back(vertex);
   }
 
   // compute segment times
