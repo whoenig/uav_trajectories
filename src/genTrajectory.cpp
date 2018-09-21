@@ -106,8 +106,7 @@ int main(int argc, char **argv)
 
   // compute segment times
   std::vector<double> segment_times;
-  const double magic_fabian_constant = 6.5; // A tuning parameter.
-  segment_times = estimateSegmentTimes(vertices, v_max, a_max, magic_fabian_constant);
+  segment_times = estimateSegmentTimes(vertices, v_max, a_max);
 
   // solve
   const int N = 8;
@@ -129,7 +128,7 @@ int main(int argc, char **argv)
   parameters.initial_stepsize_rel = 0.1;
   parameters.inequality_constraint_tolerance = 0.1;
 
-  mav_trajectory_generation::PolynomialOptimizationNonLinear<N> opt(dimension, parameters, false);
+  mav_trajectory_generation::PolynomialOptimizationNonLinear<N> opt(dimension, parameters);
   opt.setupFromVertices(vertices, segment_times, derivative_to_optimize);
   opt.addMaximumMagnitudeConstraint(mav_trajectory_generation::derivative_order::VELOCITY, v_max);
   opt.addMaximumMagnitudeConstraint(mav_trajectory_generation::derivative_order::ACCELERATION, a_max);

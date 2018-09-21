@@ -20,7 +20,7 @@ include_directories(
 add_library(mav_trajectory_generation
   mav_trajectory_generation/mav_trajectory_generation/src/motion_defines.cpp
   mav_trajectory_generation/mav_trajectory_generation/src/polynomial.cpp
-  mav_trajectory_generation/mav_trajectory_generation/src/rpoly.cpp
+  mav_trajectory_generation/mav_trajectory_generation/src/rpoly/rpoly_ak1.cpp
   mav_trajectory_generation/mav_trajectory_generation/src/segment.cpp
   mav_trajectory_generation/mav_trajectory_generation/src/timing.cpp
   mav_trajectory_generation/mav_trajectory_generation/src/trajectory.cpp
