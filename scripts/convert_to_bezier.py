@@ -30,7 +30,7 @@ trajstr = trajstr[1:]
 traj = []
 for l in trajstr:
     tr = []
-    for p in l[:17]:
+    for p in l[:25]:
         tr.append(float(p))
     traj.append(tr)
 
@@ -53,7 +53,7 @@ invmtr = inv(matrixnp)
 
 out = open(outputfile, "w")
 
-out.write("duration,p0x,p0y,p1x,p1y,p2x,p2y,p3x,p3y,p4x,p4y,p5x,p5y,p6x,p6y,p7x,p7y\n")
+out.write("#duration,p0x,p0y,p0z,...\n")
 
 for trj in traj:
     duration = trj[0]
@@ -61,18 +61,23 @@ for trj in traj:
     for i in range(8):
         trj[1+i] *= multip
         trj[9+i] *= multip
+        trj[17+i] *= multip
         multip *= duration
 
     xnp = np.transpose(np.array(trj[1:9]))
-    ynp = np.transpose(np.array(trj[9:]))
+    ynp = np.transpose(np.array(trj[9:17]))
+    znp = np.transpose(np.array(trj[17:]))
     xctrl = np.matmul(invmtr, xnp).tolist()
     yctrl = np.matmul(invmtr, ynp).tolist()
+    zctrl = np.matmul(invmtr, znp).tolist()
     pstr = ""
     pstr += str(duration) + ","
     for i in range(7):
         pstr += str(xctrl[i]) + ","
         pstr += str(yctrl[i]) + ","
-    pstr += str(xctrl[-1]) +","
-    pstr += str(yctrl[-1])
+        pstr += str(zctrl[i]) + ","
+    pstr += str(xctrl[-1]) + ","
+    pstr += str(yctrl[-1]) + ","
+    pstr += str(zctrl[-1])
     out.write(pstr + "\n")
 out.close()
