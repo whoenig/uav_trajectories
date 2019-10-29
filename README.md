@@ -27,15 +27,30 @@ make
 
 ## Polynomial Trajectories
 
-### Generate Trajectory given waypoints
+### Generate Trajectory Given Waypoints
 
 This program takes a sequence of waypoints and dynamic quadrotor limits as inputs, and produces a smooth trajectory (with 0 derivatives at the beginning and end) that can be executed safely.
+All waypoints will be visited in order and the time of arrival at a waypoint is computed automatically.
 
 Example:
 
 ```
 ./genTrajectory -i ../examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o traj1.csv
 ```
+
+### Generate Trajectory Given Time-Position Pairs
+
+This python script fits an 8th order polynomial through the given time/position pair. This can be useful to define a choreography of multiple UAVs.
+All derivatives are 0 at the beginning and the end.
+
+Example:
+
+```
+python3 ../examples/circle_with_time.py
+python3 ../scripts/generate_trajectory.py timed_waypoints_circle0.csv circle0.csv --pieces 5
+```
+
+Here, the first script generates timed waypoints and writes them into csv files. The second script fits 5 pieces of an 8th-order spline through the generated waypoints.
 
 ### Visualize Trajectory
 
