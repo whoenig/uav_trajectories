@@ -25,6 +25,24 @@ cmake ..
 make
 ```
 
+## Docker image
+
+Instead of building the code locally, the Dockerfile can be used to containerize the application.
+This is useful if you don't want to install dependencies in your local environment or if you are
+using OSX.
+
+To build the image use
+
+```
+docker build . -t genTrajectory
+```
+
+Use it by mapping your local file system into the container. In this example the current dir
+is mapped to ```/module```. The genTrajectory application is running by default in the container
+and all you need to add is the arguments
+
+```docker run --rm -it -v $PWD:/module genTrajectory --input /module/examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o /module/traj1.csv```
+
 ## Polynomial Trajectories
 
 ### Generate Trajectory Given Waypoints
