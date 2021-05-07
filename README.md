@@ -58,7 +58,7 @@ All waypoints will be visited in order and the time of arrival at a waypoint is 
 Example:
 
 ```
-./genTrajectory -i ../examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o traj1.csv
+./genTrajectory -i examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o traj1.csv
 ```
 
 ### Generate Trajectory Given Time-Position Pairs

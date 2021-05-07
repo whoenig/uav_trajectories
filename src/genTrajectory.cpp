@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 #include <mav_trajectory_generation/polynomial_optimization_linear.h>
 #include <mav_trajectory_generation/polynomial_optimization_nonlinear.h>
@@ -64,6 +65,10 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  if (!boost::filesystem::exists(inputFile)) {
+    std::cerr << "No such file: " << inputFile << std::endl;
+    return 1;
+  }
 
   mav_trajectory_generation::Vertex::Vector vertices;
   const int dimension = 3;
