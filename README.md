@@ -15,6 +15,11 @@ Tested on Ubuntu 16.04. Install additional dependencies using:
 sudo apt install libnlopt-dev libgoogle-glog-dev
 ```
 
+And on Fedora 33 with installed dependencies:
+```
+sudo dnf install NLopt-devel glog-devel eigen3-devel boost-devel
+```
+
 Clone and build this repository:
 
 ```
