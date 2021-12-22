@@ -9,10 +9,10 @@ We use the provided library in that package, but do not require ROS for executio
 
 # Building
 
-Tested on Ubuntu 16.04. Install additional dependencies using:
+Tested on Ubuntu 20.04. Install additional dependencies using:
 
 ```
-sudo apt install libeigen3-dev libnlopt-dev libgoogle-glog-dev
+sudo apt install libeigen3-dev libboost-dev libnlopt-dev libgoogle-glog-dev
 ```
 
 And on Fedora 33 with installed dependencies:
