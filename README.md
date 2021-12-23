@@ -12,7 +12,7 @@ We use the provided library in that package, but do not require ROS for executio
 Tested on Ubuntu 20.04. Install additional dependencies using:
 
 ```
-sudo apt install libeigen3-dev libboost-program-options-dev libboost-filesystem-dev libnlopt-dev libgoogle-glog-dev
+sudo apt install libeigen3-dev libboost-program-options-dev libboost-filesystem-dev libnlopt-cxx-dev libgoogle-glog-dev
 ```
 
 And on Fedora 33 with installed dependencies:
