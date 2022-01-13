@@ -68,7 +68,6 @@ def func_eq_constraint_der_value(coefficients, i, t, desired_value, order):
 
 def generate_trajectory(data, num_pieces):
   piece_length = data[-1,0] / num_pieces
-  # print(piece_length)
 
   x0 = np.zeros(num_pieces * 8)
 
@@ -87,15 +86,16 @@ def generate_trajectory(data, num_pieces):
   resX = scipy.optimize.minimize(func, x0, (data[:,0], data[:,1], piece_length), method="SLSQP", options={"maxiter": 1000}, 
     constraints=constraints
     )
-  print(resX.fun)
   resY = scipy.optimize.minimize(func, x0, (data[:,0], data[:,2], piece_length), method="SLSQP", options={"maxiter": 1000}, 
     constraints=constraints
     )
-  print(resY.fun)
   resZ = scipy.optimize.minimize(func, x0, (data[:,0], data[:,3], piece_length), method="SLSQP", options={"maxiter": 1000}, 
     constraints=constraints
     )
-  print(resZ.fun)
+
+  resYaw = scipy.optimize.minimize(func, x0, (data[:,0], data[:,4], piece_length), method="SLSQP", options={"maxiter": 1000}, 
+    constraints=constraints
+    )
 
   traj = uav_trajectory.Trajectory()
   traj.polynomials = [uav_trajectory.Polynomial4D(
@@ -103,7 +103,8 @@ def generate_trajectory(data, num_pieces):
     np.array(resX.x[i*8:(i+1)*8][::-1]),
     np.array(resY.x[i*8:(i+1)*8][::-1]),
     np.array(resZ.x[i*8:(i+1)*8][::-1]),
-    np.zeros((8,))) for i in range(0, num_pieces)]
+    np.array(resYaw.x[i*8:(i+1)*8][::-1])) for i in range(0, num_pieces)]
+    
   traj.duration = data[-1,0]
   return traj
 
@@ -115,6 +116,6 @@ if __name__ == "__main__":
   parser.add_argument("--pieces", type=int, default=5, help="number of pieces")
   args = parser.parse_args()
 
-  data = np.loadtxt(args.input, delimiter=',', skiprows=1)
+  data = np.loadtxt(args.input) 
   traj = generate_trajectory(data, args.pieces)
   traj.savecsv(args.output)
