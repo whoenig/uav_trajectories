@@ -116,6 +116,6 @@ if __name__ == "__main__":
   parser.add_argument("--pieces", type=int, default=5, help="number of pieces")
   args = parser.parse_args()
 
-  data = np.loadtxt(args.input) 
+  data = np.loadtxt(args.input, delimiter=',', skiprows=1)
   traj = generate_trajectory(data, args.pieces)
   traj.savecsv(args.output)
