@@ -2,7 +2,7 @@ import numpy as np
 import math
 import csv
 
-numRobots = 1
+numRobots = 5
 
 r = 0.3
 height = 0.7
@@ -14,7 +14,7 @@ omega = math.radians(100) #rad/sec
 for i in range(0, numRobots):
     phase = 2 * np.pi / numRobots * i
 
-    with open("/home/akmaral/uav_trajectories/scripts/timed_waypoints_circle{}.csv".format(i), "w") as f:
+    with open("timed_waypoints_circle{}.csv".format(i), "w") as f:
         f.write("t,x,y,z,yaw\n")
 
         for t in np.linspace(0, T, 100):
