@@ -75,6 +75,14 @@ python3 ../scripts/generate_trajectory.py timed_waypoints_circle0.csv circle0.cs
 
 Here, the first script generates timed waypoints and writes them into csv files. The second script fits 5 pieces of an 8th-order spline through the generated waypoints.
 
+This scripts also supports yaw. Example for an in-place yaw rotation:
+
+```
+python3 ../examples/yaw_with_time.py
+python3 ../scripts/generate_trajectory.py timed_waypoints_yaw.csv yaw0.csv --pieces 5
+python3 ../scripts/plot_trajectory.py yaw0.csv
+```
+
 ### Visualize Trajectory
 
 A python script can be used to visualize a trajectory csv-file (3D plot, velocity, acceleration, angular velocity, yaw).
