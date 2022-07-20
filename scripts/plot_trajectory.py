@@ -85,8 +85,9 @@ if __name__ == "__main__":
     print("max speed (m/s): (W., Fr., Scr.)", np.max(velocity), np.max(velocity1), np.max(velocity2))
     print("max acceleration (m/s^2): (W., Fr., Scr.) ", np.max(acceleration), np.max(acceleration1), np.max(acceleration2))
     print("max omega (rad/s): (W., Fr., Scr.) ", np.max(omega), np.max(omega1), np.max(omega2))
-    print("max roll (deg): (W., Fr., Scr.) ", np.max(np.degrees(evals[:,13])), np.max(np.degrees(evals1[:,13])), np.max(np.degrees(evals2[:,13])))
-    print("max pitch (deg): (W., Fr., Scr.) ", np.max(np.degrees(evals[:,15])), np.max(np.degrees(evals1[:,15])), np.max(np.degrees(evals2[:,14])))
+    print("max roll  (deg): (W., Fr., Scr.) ", np.max(np.degrees(evals[:,13])), np.max(np.degrees(evals1[:,13])), np.max(np.degrees(evals2[:,13])))
+    print("max pitch (deg): (W., Fr., Scr.) ", np.max(np.degrees(evals[:,14])), np.max(np.degrees(evals1[:,14])), np.max(np.degrees(evals2[:,14])))
+    print("max yaw   (deg): (W., Fr., Scr.) ", np.max(np.degrees(evals[:,12])), np.max(np.degrees(evals1[:,12])), np.max(np.degrees(evals2[:,12])))
   else:
     print("max speed (m/s): ", np.max(velocity))
     print("max acceleration (m/s^2): ", np.max(acceleration))
@@ -138,10 +139,10 @@ if __name__ == "__main__":
     ax.set_ylabel('omega_y')
 
     ax = plt.subplot(gs[2, 0])
-    ax.plot(ts, evals[:,11])
-    ax.plot(ts, evals1[:,11])
-    ax.plot(ts, evals2[:,11])
+    ax.plot(ts, evals[:,11] , label='W.')
+    ax.plot(ts, evals1[:,11], label='Fr.')
+    ax.plot(ts, evals2[:,11], label='Sc.')
     ax.set_ylabel('omega_z')
-
+    ax.legend(loc='lower center', ncol=3)
   plt.show()
 
