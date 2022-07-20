@@ -11,6 +11,7 @@ import uav_trajectory
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("trajectory", type=str, help="CSV file containing trajectory")
+  parser.add_argument("--dt", type=float, default=0.01, help="time steps in seconds")
   parser.add_argument("--mass", type=float, help="mass of the UAV")
   parser.add_argument("--stretchtime", type=float, help="stretch time factor (smaller means faster)")
   args = parser.parse_args()
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     traj1.stretchtime(args.stretchtime)
     traj2.stretchtime(args.stretchtime)
     
-  ts = np.arange(0, traj.duration, 0.01)
+  ts = np.arange(0, traj.duration, args.dt)
   evals = np.empty((len(ts), 21))
   for t, i in zip(ts, range(0, len(ts))):
     e = traj.eval(t)
@@ -44,6 +45,19 @@ if __name__ == "__main__":
     evals[i, 14]    = e.pitch
     evals[i, 15:18] = e.jerk
     evals[i, 18::]  = e.snap
+  
+  full_traj = np.zeros((16, len(ts)))
+  full_traj[0,:] = ts
+  full_traj[1:4,:]  = np.transpose(evals[:,0:3])
+  full_traj[4:7,:]  = np.transpose(evals[:,3:6])
+  full_traj[7:10,:] = np.transpose(evals[:,6:9])
+  full_traj[10:13,:] = np.transpose(evals[:,9:12])
+  full_traj[13:16,:] = np.transpose(evals[:,12:15])
+
+  filename = args.trajectory
+  filename = filename.replace('.csv','_traj.csv')
+  print('filename: ', filename)
+  np.savetxt(filename, full_traj, delimiter=',')
 
   if args.mass:
     evals1 = np.empty((len(ts), 21))
