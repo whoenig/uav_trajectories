@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.gridspec as gridspec
 import argparse
 
@@ -18,6 +19,8 @@ if __name__ == "__main__":
 
   traj = uav_trajectory.Trajectory()
   traj.loadcsv(args.trajectory)
+  pdfname = args.trajectory.replace('.csv','.pdf')
+  f = PdfPages(pdfname)
 
   if args.mass:
     traj1 = uav_trajectory.Trajectory()
@@ -56,7 +59,6 @@ if __name__ == "__main__":
 
   filename = args.trajectory
   filename = filename.replace('.csv','_traj.csv')
-  print('filename: ', filename)
   np.savetxt(filename, full_traj, delimiter=',')
 
   if args.mass:
@@ -111,52 +113,57 @@ if __name__ == "__main__":
 
   # Create 3x1 sub plots
   gs = gridspec.GridSpec(6, 1)
-  fig = plt.figure()
+  fig1 = plt.figure()
 
-  ax = plt.subplot(gs[0:2, 0], projection='3d') # row 0
-  ax.plot(evals[:,0], evals[:,1], evals[:,2])
+  ax1 = plt.subplot(gs[0:2, 0], projection='3d') # row 0
+  ax1.plot(evals[:,0], evals[:,1], evals[:,2], lw=0.85)
 
-  ax = plt.subplot(gs[2, 0]) # row 2
-  ax.plot(ts, velocity)
-  ax.set_ylabel("velocity [m/s]")
+  ax1 = plt.subplot(gs[2, 0]) # row 2
+  ax1.plot(ts, velocity, lw=0.85)
+  ax1.set_ylabel("vel")
 
-  ax = plt.subplot(gs[3, 0]) # row 3
-  ax.plot(ts, acceleration)
-  ax.set_ylabel("acceleration [m/s^2]")
+  ax1 = plt.subplot(gs[3, 0]) # row 3
+  ax1.plot(ts, acceleration, lw=0.85)
+  ax1.set_ylabel("acc")
 
-  ax = plt.subplot(gs[4, 0]) # row 4
-  ax.plot(ts, omega)
+  ax1 = plt.subplot(gs[4, 0]) # row 4
+  ax1.plot(ts, omega, lw=0.85)
   if args.mass:
-    ax.plot(ts, omega1)
-    ax.plot(ts, omega2)
-  ax.set_ylabel("omega [rad/s]")
+    ax1.plot(ts, omega1, lw=0.85)
+    ax1.plot(ts, omega2, lw=0.85)
+  ax1.set_ylabel("w")
 
-  ax = plt.subplot(gs[5, 0]) # row 5
-  ax.plot(ts, np.degrees(evals[:,12]))
-  ax.set_ylabel("yaw [deg]")
+  ax1 = plt.subplot(gs[5, 0]) # row 5
+  ax1.plot(ts, np.degrees(evals[:,12]), lw=0.85)
+  ax1.set_ylabel("yaw ")
 
   if args.mass:
     gs = gridspec.GridSpec(3, 1)
-    fig1 = plt.figure()
+    fig2 = plt.figure()
     plt.legend('omega_i')
 
-    ax = plt.subplot(gs[0, 0])
-    ax.plot(ts, evals[:,9])
-    ax.plot(ts, evals1[:,9])
-    ax.plot(ts, evals2[:,9])
-    ax.set_ylabel('omega_x')
+    ax2 = plt.subplot(gs[0, 0])
+    ax2.plot(ts, evals[:,9] ,lw=0.85)
+    ax2.plot(ts, evals1[:,9] ,lw=0.85)
+    ax2.plot(ts, evals2[:,9] ,lw=0.85)
+    ax2.set_ylabel('omega_x')
     
-    ax = plt.subplot(gs[1, 0])
-    ax.plot(ts, evals[:,10])
-    ax.plot(ts, evals1[:,10])
-    ax.plot(ts, evals2[:,10])
-    ax.set_ylabel('omega_y')
+    ax2 = plt.subplot(gs[1, 0])
+    ax2.plot(ts, evals[:,10] , lw=0.85)
+    ax2.plot(ts, evals1[:,10], lw=0.85)
+    ax2.plot(ts, evals2[:,10], lw=0.85)
+    ax2.set_ylabel('omega_y')
 
-    ax = plt.subplot(gs[2, 0])
-    ax.plot(ts, evals[:,11] , label='W.')
-    ax.plot(ts, evals1[:,11], label='Fr.')
-    ax.plot(ts, evals2[:,11], label='Sc.')
-    ax.set_ylabel('omega_z')
-    ax.legend(loc='lower center', ncol=3)
+    ax2 = plt.subplot(gs[2, 0])
+    ax2.plot(ts, evals[:,11] , label='W.', lw=0.85)
+    ax2.plot(ts, evals1[:,11], label='Fr.',lw=0.85)
+    ax2.plot(ts, evals2[:,11], label='Sc.',lw=0.85)
+    ax2.set_ylabel('omega_z')
+    ax2.legend(loc='lower center', ncol=3)
+
+  fig1.savefig(f, format='pdf', bbox_inches='tight')
+  fig2.savefig(f, format='pdf', bbox_inches='tight')
+  f.close()
   plt.show()
+
 
