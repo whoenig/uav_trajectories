@@ -1,6 +1,6 @@
-from ubuntu:16.04
+from ubuntu:22.04
 
-RUN apt-get update && apt-get install -y git build-essential libnlopt-dev libgoogle-glog-dev cmake libeigen3-dev libboost-.*-dev
+RUN apt-get update && apt-get install -y git build-essential libnlopt-dev libnlopt-cxx-dev libgoogle-glog-dev cmake libeigen3-dev libboost-.*-dev
 
 ADD ./ /uav_trajectories/
 
