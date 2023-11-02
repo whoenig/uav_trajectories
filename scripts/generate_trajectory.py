@@ -74,11 +74,11 @@ def generate_trajectory(data, num_pieces):
   constraints = []
   # piecewise values and derivatives have to match
   for i in range(1, num_pieces):
-    for order in range(0, 4):
+    for order in range(0, 5):
       constraints.append({'type': 'eq', 'fun': func_eq_constraint_der, 'args': (i, piece_length, order)})
 
   # zero derivative at the beginning and end
-  for order in range(1, 3):
+  for order in range(1, 5):
     constraints.append({'type': 'eq', 'fun': func_eq_constraint_der_value, 'args': (0, 0, 0, order)})
     constraints.append({'type': 'eq', 'fun': func_eq_constraint_der_value, 'args': (num_pieces-1, piece_length, 0, order)})
 
