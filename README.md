@@ -39,14 +39,14 @@ using OSX.
 To build the image use
 
 ```
-docker build . -t genTrajectory
+docker build . -t gentrajectory
 ```
 
 Use it by mapping your local file system into the container. In this example the current dir
 is mapped to ```/module```. The genTrajectory application is running by default in the container
 and all you need to add is the arguments
 
-```docker run --rm -it -v $PWD:/module genTrajectory --input /module/examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o /module/traj1.csv```
+```docker run --rm -it -v $PWD:/module gentrajectory --input /module/examples/waypoints1.csv --v_max 1.0 --a_max 1.0 -o /module/traj1.csv```
 
 ## Polynomial Trajectories
 
