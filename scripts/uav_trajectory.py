@@ -36,6 +36,8 @@ class TrajectoryOutput:
     self.pos = None   # position [m]
     self.vel = None   # velocity [m/s]
     self.acc = None   # acceleration [m/s^2]
+    self.jerk = None
+    self.snap = None
     self.omega = None # angular velocity [rad/s]
     self.yaw = None   # yaw angle [rad]
     self.roll = None  # required roll angle [rad]
@@ -88,7 +90,10 @@ class Polynomial4D:
     # 3rd derivative
     derivative3 = derivative2.derivative()
     jerk = np.array([derivative3.px.eval(t), derivative3.py.eval(t), derivative3.pz.eval(t)])
+    result.jerk = jerk
 
+    derivative4 = derivative3.derivative()
+    result.snap = np.array([derivative4.px.eval(t), derivative4.py.eval(t), derivative4.pz.eval(t)])
     thrust = result.acc + np.array([0, 0, 9.81]) # add gravity
 
     z_body = normalize(thrust)
