@@ -33,16 +33,23 @@ class Polynomial:
 
 class TrajectoryOutput:
   def __init__(self):
+    # flat output and derivatives
     self.pos = None   # position [m]
     self.vel = None   # velocity [m/s]
     self.acc = None   # acceleration [m/s^2]
-    self.jerk = None
-    self.snap = None
-    self.omega = None # angular velocity [rad/s]
+    self.jerk = None  # jerk [m/s^3]
+    self.snap = None  # snap [m/s^2]
     self.yaw = None   # yaw angle [rad]
-    self.roll = None  # required roll angle [rad]
-    self.pitch = None # required pitch angle [rad]
-
+    self.yawd = None  # yaw velocity [rad/s]
+    self.yawdd = None # yaw acceleration [rad/s^2]
+    # states
+    self.rotation = None # 3x3 rotation matrix
+    self.omega = None    # angular velocity [rad/s]
+    self.omegad = None   # angular acceleration [rad/s^2]
+    # output
+    self.torque = None
+    self.force = None
+    self.motorforces = None
 
 # 4d single polynomial piece for x-y-z-yaw, includes duration.
 class Polynomial4D:
@@ -72,7 +79,9 @@ class Polynomial4D:
   # see Daniel Mellinger, Vijay Kumar:
   #     Minimum snap trajectory generation and control for quadrotors. ICRA 2011: 2520-2525
   #     section III. DIFFERENTIAL FLATNESS
-  def eval(self, t):
+  # Note that omega_z is wrong in that reference. Details and equations implemented here can be found in
+  #     https://arxiv.org/abs/1712.02402
+  def eval(self, t, mass=None, inertia=None):
     result = TrajectoryOutput()
     # flat variables
     result.pos = np.array([self.px.eval(t), self.py.eval(t), self.pz.eval(t)])
@@ -81,34 +90,63 @@ class Polynomial4D:
     # 1st derivative
     derivative = self.derivative()
     result.vel = np.array([derivative.px.eval(t), derivative.py.eval(t), derivative.pz.eval(t)])
-    dyaw = derivative.pyaw.eval(t)
+    result.yawd = derivative.pyaw.eval(t)
 
     # 2nd derivative
     derivative2 = derivative.derivative()
     result.acc = np.array([derivative2.px.eval(t), derivative2.py.eval(t), derivative2.pz.eval(t)])
+    result.yawdd = derivative2.pyaw.eval(t)
 
     # 3rd derivative
     derivative3 = derivative2.derivative()
     jerk = np.array([derivative3.px.eval(t), derivative3.py.eval(t), derivative3.pz.eval(t)])
     result.jerk = jerk
 
+    # 4th derivative
     derivative4 = derivative3.derivative()
     result.snap = np.array([derivative4.px.eval(t), derivative4.py.eval(t), derivative4.pz.eval(t)])
-    thrust = result.acc + np.array([0, 0, 9.81]) # add gravity
 
-    z_body = normalize(thrust)
-    x_world = np.array([np.cos(result.yaw), np.sin(result.yaw), 0])
-    y_body = normalize(np.cross(z_body, x_world))
-    x_body = np.cross(y_body, z_body)
+    # Rotation
+    xc = np.array([np.cos(result.yaw), np.sin(result.yaw), 0.0])
+    yc = np.array([-np.sin(result.yaw), np.cos(result.yaw), 0.0])
+    g = np.array([0.0, 0.0, -9.81])
 
-    jerk_orth_zbody = jerk - (np.dot(jerk, z_body) * z_body)
-    h_w = jerk_orth_zbody / np.linalg.norm(thrust)
+    xb = np.cross(yc, result.acc - g)
+    xb = xb / np.linalg.norm(xb)
 
-    result.omega = np.array([-np.dot(h_w, y_body), np.dot(h_w, x_body), z_body[2] * dyaw])
+    yb = np.cross(result.acc - g, xb)
+    yb = yb / np.linalg.norm(yb)
 
-    # compute required roll/pitch angles
-    result.pitch = np.arcsin(-x_body[2])
-    result.roll = np.arctan2(y_body[2], z_body[2])
+    zb = np.cross(xb, yb)
+
+    R = np.column_stack((xb, yb, zb))
+    result.rotation = R
+
+    # omega
+    c = zb.dot(result.acc - g)
+    b1 = c
+    a2 = c
+    b3 = -yc.dot(zb)
+    c3 = np.linalg.norm(np.cross(yc, zb))
+    d1 = xb.dot(result.jerk)
+    d2 = -yb.dot(jerk)
+    d3 = result.yawd * xc.dot(xb)
+    result.omega = np.array([d2/b1, d1/b1, (b1*d3-b3*d1)/(b1*c3)])
+
+    # omega dot
+    c_dot = zb.dot(result.jerk)
+    e1 = xb.dot(result.snap) - 2.0 * c_dot * result.omega[1] - c * result.omega[0] * result.omega[2]
+    e2 = -yb.dot(result.snap) - 2.0 * c_dot * result.omega[0] + c * result.omega[1] * result.omega[2]
+    e3 = result.yawdd * xc.dot(xb) + 2.0 * result.yawd * result.omega[2] * xc.dot(yb) - 2.0 * result.yawd*result.omega[2]*xc.dot(zb) - result.omega[0]*result.omega[1]*yc.dot(yb) - result.omega[0]*result.omega[2]*yc.dot(zb)
+    result.omegad = np.array([e2/a2, e1/b1, (b1*e3-b3*e1)/(b1*c3)])
+
+    # force and torque
+    if mass is not None:
+      f = c * mass
+      result.force = f
+
+      if inertia is not None:
+        result.torque = inertia @ result.omegad - np.cross(inertia @ result.omega, result.omega)
 
     return result
 
@@ -138,12 +176,12 @@ class Trajectory:
       p.stretchtime(factor)
     self.duration *= factor
 
-  def eval(self, t):
+  def eval(self, t, mass=None, inertia=None):
     assert t >= 0
     assert t <= self.duration
 
     current_t = 0.0
     for p in self.polynomials:
       if t < current_t + p.duration:
-        return p.eval(t - current_t)
+        return p.eval(t - current_t, mass, inertia)
       current_t = current_t + p.duration
