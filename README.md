@@ -34,9 +34,12 @@ make
 
 Instead of building the code locally, the Dockerfile can be used to containerize the application.
 This is useful if you don't want to install dependencies in your local environment or if you are
-using OSX.
-
-To build the image use
+using OSX.\
+Before building the docker image 
+```
+git submodule update --init --recursive
+```
+then, to build the image use
 
 ```
 docker build . -t gentrajectory
